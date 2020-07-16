@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Rectangles</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.7.1.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>
+
+    <style type="text/css">
+        /* normalize */
+        *, body, button, input, textarea, select {
+            text-rendering: optimizeLegibility;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td {
+            margin:0;
+            padding:0;
+        }
+        table {
+            border-collapse:collapse;
+            border-spacing:0;
+        }
+        fieldset,img {
+            border:0;
+        }
+        address,caption,cite,code,dfn,em,strong,th,var {
+            font-style:normal;
+            font-weight:normal;
+        }
+        ol,ul {
+            list-style:none;
+        }
+        caption,th {
+            text-align:left;
+        }
+        h1,h2,h3,h4,h5,h6 {
+            font-size:100%;
+            font-weight:normal;
+        }
+        q:before,q:after {
+            content:'';
+        }
+        abbr,acronym { border:0;}
+        /* styles */
+        body {
+            background-color: black;
+            color: white;
+        }
+        .tester {
+            border:1px solid white;
+            width:50px;
+            height:50px
+        }
+        .d1 {
+            background-color: #0a5e69;
+            z-index: 1;
+        }
+        .d2 {
+            background-color: #0000cc;
+            position: relative;
+            z-index: 2;
+        }
+        .overlap {
+            background-color: #9e0c0f;
+            left:0;
+            position: absolute;
+            top:0;
+            z-index: 100;
+        }
+        b {
+            font-weight: bold;
+        }
+        .instructions {
+            position: absolute;
+            top: 0;
+            left: 25%;
+        }
+        #info {
+            float: right;
+        }
+    </style>
+</head>
+<body>
+<p class="instructions"><b>Drag and move the squares</b></p>
+<div id="info">
+    d1x:<br/>
+    d2x:<br/>
+    Overlap X:<br/>
+    Overlap Y:<br/>
+    Total overlap (px²):
+</div>
+
+<div class="tester d1"></div>
+<div class="tester d2"><div class="overlap"></div> </div>
+<script type="text/javascript">
+    let divs = $('.tester').resizable().draggable({
+        drag: function(){
+            //window.alert(divs.eq(0).position())
+            let elem1 = divs.eq(0);
+            let elem2 = divs.eq(1);
+            let rect1 = elem1.position();
+            let d0 = divs.eq(0).position(),
+                d1 = divs.eq(1).position(),
+                d1x = d0.left,
+                d1y = d0.top,
+                d1xMax = d0.left + divs.eq(0).width(),
+                d1yMax = d0.top + divs.eq(0).height(),
+                d2x = d1.left,
+                d2y = d1.top,
+                d2xMax = d1.left + divs.eq(1).width(),
+                d2yMax = d1.top + divs.eq(1).height(),
+
+                x_overlap = Math.max(0, Math.min(d1xMax,d2xMax) - Math.max(d1x,d2x)),
+                y_overlap = Math.max(0, Math.min(d1yMax,d2yMax) - Math.max(d1y,d2y));
+            let coverage = x_overlap * y_overlap;
+            if (coverage > 0) {
+                // handle cases where the div overlaps from top or bottom
+                if (d1x > d2x) {
+                    $('.overlap').css('right', 0).css('left', 'auto');
+                } else {
+                    $('.overlap').css('right', 'auto').css('left', 0);
+                }
+                if (d1y > d2y) {
+                    $('.overlap').css('bottom', 0).css('top', 'auto');
+                } else {
+                    $('.overlap').css('bottom', 'auto').css('top', 0);
+                }
+                // color in the overlap
+                $('.overlap').css('width', x_overlap).css('height', y_overlap);
+
+            } else {
+                $('.overlap').css('width', 0).css('height', 0);
+            }
+
+            $('#info').html('d1x: ' + d1x + ' d1y: ' + d1y + ' - d2x: ' + d2x + ' d2y: ' + d2y + ' - Overlap X: ' + x_overlap + ' - Overlap Y: ' + y_overlap + ' - Total overlap (px²): ' + coverage);
+        }
+    });
+</script>
+</body>
+</html>
